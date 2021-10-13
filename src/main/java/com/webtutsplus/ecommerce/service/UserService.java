@@ -30,16 +30,21 @@ import static com.webtutsplus.ecommerce.config.MessageStrings.USER_CREATED;
 @Service
 public class UserService {
 
-    @Autowired
+    final
     UserRepository userRepository;
 
-    @Autowired
+    final
     AuthenticationService authenticationService;
 
     Logger logger = LoggerFactory.getLogger(UserService.class);
 
+    @Autowired
+    public UserService(UserRepository userRepository, AuthenticationService authenticationService) {
+        this.userRepository = userRepository;
+        this.authenticationService = authenticationService;
+    }
 
-    public ResponseDto signUp(SignupDto signupDto)  throws CustomException {
+    public ResponseDto signUp(SignupDto signupDto) throws CustomException {
         // Check to see if the current email address has already been registered.
         if (Helper.notNull(userRepository.findByEmail(signupDto.getEmail()))) {
             // If the email address has been registered then throw an exception.
