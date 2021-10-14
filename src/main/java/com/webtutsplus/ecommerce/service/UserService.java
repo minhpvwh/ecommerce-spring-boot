@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 import static com.webtutsplus.ecommerce.config.MessageStrings.USER_CREATED;
 
@@ -62,10 +63,9 @@ public class UserService {
 
         User user = new User(signupDto.getFirstName(), signupDto.getLastName(), signupDto.getEmail(), Role.user, encryptedPassword );
 
-        User createdUser;
         try {
             // save the User
-            createdUser = userRepository.save(user);
+            User createdUser = userRepository.save(user);
             // generate token for user
             final AuthenticationToken authenticationToken = new AuthenticationToken(createdUser);
             // save token in database
@@ -145,10 +145,7 @@ public class UserService {
     }
 
     boolean canCrudUser(Role role) {
-        if (role == Role.admin || role == Role.manager) {
-            return true;
-        }
-        return false;
+        return role == Role.admin || role == Role.manager;
     }
 
     boolean canCrudUser(User userUpdating, Integer userIdBeingUpdated) {
@@ -158,9 +155,6 @@ public class UserService {
             return true;
         }
         // user can update his own record, but not his role
-        if (role == Role.user && userUpdating.getId() == userIdBeingUpdated) {
-            return true;
-        }
-        return false;
+        return role == Role.user && Objects.equals(userUpdating.getId(), userIdBeingUpdated);
     }
 }
